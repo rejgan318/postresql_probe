@@ -9,7 +9,7 @@
 import string
 from pprint import pprint
 from random import choice
-import os
+from os import getenv
 import psycopg2
 from dotenv import load_dotenv
 
@@ -33,13 +33,14 @@ if __name__ == '__main__':
     """
     load_dotenv()
     conn = psycopg2.connect(
-        host=os.getenv('PG_HOST', 'localhost'),
-        port=os.getenv('PG_PORT', '5432'),
-        database=os.getenv('PG_DB'),
-        user=os.getenv('PG_USER'),
-        password=os.getenv('PG_PASSWORD'),
+        host=(host := getenv('PG_HOST', 'localhost')),
+        port=(port := getenv('PG_PORT', '5432')),
+        database=(database := getenv('PG_DB')),
+        user=(user := getenv('PG_USER')),
+        password=(password := getenv('PG_PASSWORD')),
     )
-    TABLE = os.getenv('PG_TABLE', 'table_from_python')
+    print(f'Подключено к PosgreSQL:\n{host=}\n{port=}\n{database=}\n{user=}\n{password=}')
+    TABLE = getenv('PG_TABLE', 'table_from_python')
     cur = conn.cursor()
     cur.execute(f"""
     DROP TABLE IF EXISTS {TABLE};
@@ -49,11 +50,12 @@ if __name__ == '__main__':
         person text not null
     );       
     """)
+    print(f'Создана таблица {TABLE}', end='')
 
-    for i in range(10):
-        # TODO Оптимизировать на 1 INSERT Или не надо?
+    for i in range(NROWS := 10):
         cur.execute(f'INSERT INTO {TABLE} (uid, login, person) VALUES (%s, %s, %s);',
                     (i, generate_login(i), generate_name()))
+    print(f', добавлено {NROWS} записей:')
 
     cur.execute(f'SELECT * FROM {TABLE};')
     sql_data = cur.fetchall()
