@@ -32,6 +32,13 @@ if __name__ == '__main__':
     Либо не устанавливать вовсе, если присутствует значение по умолчанию 
     """
     load_dotenv()
+    host = getenv('PG_HOST', 'localhost')
+    port = getenv('PG_PORT', '5432')
+    database = getenv('PG_DB')
+    user = getenv('PG_USER')
+    password = getenv('PG_PASSWORD')
+    print(f'Попытка подключения с параметрами :\n{host=} {port=} {database=} {user=} {password=}')
+
     conn = psycopg2.connect(
         host=(host := getenv('PG_HOST', 'localhost')),
         port=(port := getenv('PG_PORT', '5432')),
